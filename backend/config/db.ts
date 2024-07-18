@@ -1,9 +1,17 @@
 import { Sequelize } from "sequelize";
-import dbConfig from "./dbConfig";
+import dotenv from "dotenv";
 
-const { host, user, password, database } = dbConfig;
+dotenv.config();
 
-const db = new Sequelize(database, user, password, { host, dialect: "mysql" });
+const db = new Sequelize(
+    process.env.DB_NAME ?? "", 
+    process.env.DB_USER ?? "", 
+    process.env.DB_PASSWORD ?? "",
+    { 
+        host: process.env.DB_HOST ?? "", 
+        dialect: "mysql" 
+    }
+);
 
 export const checkDatabaseConnection = async () => {
     try {
