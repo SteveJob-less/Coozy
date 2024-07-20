@@ -15,7 +15,7 @@ type UserAttributes = {
 type UserCreationAttributes = Pick<UserAttributes, Exclude<keyof UserAttributes, 'id' | 'createdAt' | 'updatedAt'>>;
 class User extends Model<UserAttributes, UserCreationAttributes>{}
 
-const defineUser = db.define<User, UserAttributes>("user", {
+const defineUser = db.define<User, UserAttributes>("users", {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
