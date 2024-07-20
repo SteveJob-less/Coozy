@@ -1,9 +1,10 @@
-import { Request, Response, Router } from "express";
+import { Router } from "express";
+import signupUser from "../controllers/user/signupUser";
+import loginUser from "../controllers/user/loginUser";
 
 const router = Router();
 
-router.get("/", (_, res: Response) => {
-    res.send("Hello World");
-});
+router.post("/user/signup", signupUser);
+router.post("/user/login", loginUser);
 
 export default router;
