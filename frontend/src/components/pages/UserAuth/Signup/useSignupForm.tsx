@@ -37,7 +37,7 @@ const useSignupForm = () => {
         register,                                   // function: useForm register method
         handleSubmit,                               // function: Handle form submission
         formState: { errors, isSubmitting },        // function: Access form state: errors, status
-        setError,                                   // function: Set error manually for backend validation response
+        setError,                                   // function: Set error manually for backend validation response (just in case)
     } = useForm<z.infer<typeof signupSchema>>({
         defaultValues: defaultValues,
         resolver: zodResolver(signupSchema),
