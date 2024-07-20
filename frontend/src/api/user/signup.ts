@@ -21,27 +21,26 @@ export const signup = async (data: SignupInputs): Promise<SignupResponse | undef
 
         const response = await axios.post("http://localhost:2323/user/signup", restData);
 
-        if (response.status === 201) {
-            console.log("User created successfully:", response.data.message);
-
+        // Unexpected error
+        if (response.status !== 201) {
             return { 
-                success: true, 
-                code: response.status, 
-                message: response.data.message 
+                success: false, 
+                code: response.status,
+                message: "An unexpected error occurred." 
             };
         }
-
-        // Unexpected error
+        
+        console.log("User created successfully:", response.data.message);
         return { 
-            success: false, 
-            code: response.status,
-            message: "An unexpected error occurred." 
+            success: true, 
+            code: response.status, 
+            message: response.data.message 
         };
     } catch (error: any) {
         console.error("Error during signup:"+ error.response.status, error.response.data);
 
         // Returned when email already existed 
-        if (error.response.status === 409) { 
+        if (error.response.status >= 400) { 
             return { 
                 success: false, 
                 code: error.response.status, 
