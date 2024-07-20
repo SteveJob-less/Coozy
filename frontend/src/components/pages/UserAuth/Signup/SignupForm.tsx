@@ -44,7 +44,7 @@ const SignupForm = ({ handleSwitchForm }: SignupFormProps) => {
         if (formResult) {
             const showPrompt = setTimeout(() => {
                 setFormResult(undefined);
-            }, 5000);
+            }, 2500);
             
             return () => {
                 clearTimeout(showPrompt);
@@ -55,7 +55,7 @@ const SignupForm = ({ handleSwitchForm }: SignupFormProps) => {
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="relative grid signup-form">
             {formResult && (
-                <span className={`absolute p-3 text-lg font-semibold text-center ${formResult.isSuccess ? "text-green-300 border border-green-600 bg-green-200/10":"text-red-200 border border-red-600 bg-red-300/10"} rounded-lg -top-48`}>{formResult.prompt}</span>
+                <span className={`absolute p-3 w-full text-lg font-semibold text-center ${formResult.isSuccess ? "text-green-300 border border-green-600 bg-green-200/10":"text-red-200 border border-red-600 bg-red-300/10"} rounded-lg -top-48`}>{formResult.prompt}</span>
             )}
             <InputTextField register={register} label="Firstname" placeholder="john" errMessage={errors.Firstname?.message} />
             <InputTextField register={register} label="Lastname" placeholder="doe" errMessage={errors.Lastname?.message} />
