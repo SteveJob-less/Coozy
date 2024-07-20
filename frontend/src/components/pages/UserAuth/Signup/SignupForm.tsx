@@ -2,48 +2,64 @@ import InputPasswordField from "@/components/reusable/InputPasswordField";
 import InputTextField from "@/components/reusable/InputTextField";
 import { Button } from "@/components/ui/button";
 import useSignupForm from "./useSignupForm";
-import { SubmitHandler } from "react-hook-form";
 import { z } from "zod";
-import { simulateSignupError, SimulatedErrorResponse } from "./simulateUserAuthSignupError";
+import { useEffect, useState } from "react";
+import signup from "@/api/user/signup";
 
 type SignupFormProps = {
     handleSwitchForm: (action: "Login") => void;
 };
 
 const SignupForm = ({ handleSwitchForm }: SignupFormProps) => {
+    const [formResult, setFormResult] = useState<{ prompt?: string, isSuccess?: boolean } | undefined>(undefined);
 
     const {
         register,
         handleSubmit,
         errors,
-        isSubmitting,
         setError,
+        isSubmitting,
         signupSchema,
     } = useSignupForm();
 
-    const onSubmit: SubmitHandler<z.infer<typeof signupSchema>> = async (data) => {
+    const onSubmit = async (data: z.infer<typeof signupSchema>) => {
         try {
-            const result = await simulateSignupError();
+            const response = await signup(data);
             
-            if(!result) {
-                console.log("Signup successful", data);
-                return;
-            };
+            if (response && !response.success) {
+                setError("Email", { message: response.message })
 
-            console.log("Input Field error:", errors);
-        } catch(error) {
-            const { code, error: { field, message } } = error as SimulatedErrorResponse;
-            setError(field as any, { message });
-            console.error(`Simulated error: ${code}`, error);
-        };
+                return;
+            }
+            
+            setFormResult({prompt: response?.message, isSuccess: response?.success});
+        } catch (error) {
+            console.error("Signup error:", error);
+            
+            setFormResult({prompt: "Cannot connect to the server. Please try again later.", isSuccess: false}); // Triggered when onSubmit without server connection
+        }
     };
+
+    useEffect(() => {
+        if (formResult) {
+            const showPrompt = setTimeout(() => {
+                setFormResult(undefined);
+            }, 5000);
+            
+            return () => {
+                clearTimeout(showPrompt);
+            };
+        }
+    }, [formResult]);
     
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="relative grid signup-form">
-            {errors.root?<span id="root-error" className="absolute p-3 text-lg font-semibold text-center text-red-600 border border-red-700 rounded-lg bg-red-100/60 -top-48">{errors.root?.message}</span> : null}
+            {formResult && (
+                <span className={`absolute p-3 text-lg font-semibold text-center ${formResult.isSuccess ? "text-green-300 border border-green-600 bg-green-200/10":"text-red-200 border border-red-600 bg-red-300/10"} rounded-lg -top-48`}>{formResult.prompt}</span>
+            )}
             <InputTextField register={register} label="Firstname" placeholder="john" errMessage={errors.Firstname?.message} />
             <InputTextField register={register} label="Lastname" placeholder="doe" errMessage={errors.Lastname?.message} />
-            <InputTextField register={register} label="Email" placeholder="steve@test.yes" errMessage={errors.Email?.message} />
+            <InputTextField register={register} label="Email" placeholder="johndoe@email.com" errMessage={errors.Email?.message} />
             <InputPasswordField register={register} label="Password" placeholder="Password" errMessage={errors.Password?.message}/>
             <InputPasswordField register={register} label="ConfirmPassword" placeholder="Re-type password" errMessage={errors.ConfirmPassword?.message}/>
             <div className="flex items-center justify-center px-8 mb-2 -mt-2 text-slate-500 h-fit">
