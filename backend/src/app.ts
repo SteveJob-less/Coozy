@@ -3,9 +3,6 @@ import bodyParser from "body-parser";
 import routes from "./routes";
 import cors from "cors";
 import corsOptions from "../config/corsOptions";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const app = express();
 
