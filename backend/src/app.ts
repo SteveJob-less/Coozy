@@ -1,15 +1,15 @@
-import express, { Router, Request, Response } from "express";
+import express from "express";
 import bodyParser from "body-parser"; 
 import routes from "./routes";
 import cors from "cors";
+import corsOptions from "../config/corsOptions";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 
-app.use(cors({
-    origin: "http://localhost:5173",
-    methods: "GET, POST, PUT, DELETE",
-    allowedHeaders: "Content-Type, Authorization",
-}));
+app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
