@@ -10,7 +10,11 @@ const signupUser = async (req: Request, res: Response) => {
 
         if (existingUser) {
             console.log("User already exists");
-            return res.status(409).json({ success: false, message: "User already exists" });
+            return res.status(409).json({ 
+                success: false, 
+                code: 409,
+                message: "User already exists" 
+            });
         }
 
         const hashedPassword = await bcrypt.hash(Password, 10);
@@ -23,10 +27,19 @@ const signupUser = async (req: Request, res: Response) => {
             password: hashedPassword,
         });
 
-        res.status(201).json({ success: true, message: "User created successfully" });
+        res.status(201).json({ 
+            success: true, 
+            code: 201, 
+            message: "User created successfully" 
+        });
     } catch (error: any) {
         console.error("Error during signup:", error);
-        res.status(500).json({ success: false, message: "Internal server error" });
+
+        res.status(500).json({ 
+            success: false, 
+            code: 500,
+            message: "Internal server error" 
+        });
     }
 };
 
