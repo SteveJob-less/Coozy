@@ -1,32 +1,45 @@
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
 
+export type ExtendedRequest = Request & { user?: JwtPayload };
 
-const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+const verifyJWT = (req: ExtendedRequest, res: Response, next: NextFunction) => {
     const authHeader = req.headers['authorization'];
 
     if (!authHeader) return res.status(401).json({ 
         success: false, 
         code: 401, 
-        message: "Unauthorized to do this request",
+        message: "Unauthorized: No authorization header provided",
     });
-    console.log(authHeader);
 
-    const token = authHeader.split(' ')[1];
+    const accessToken = authHeader.split(' ')[1];
 
-    jwt.verify(
-        token, 
-        process.env.JWT_SECRET ?? "",
-        (err, decoded) => {
-            if (err) return res.status(403).json({ 
-                success: false, 
-                code: 403, 
-                message: "Invalid token" 
-            }) 
+    try {
+        const decodedAccessToken = jwt.verify(
+            accessToken, 
+            process.env.JWT_SECRET ?? "",
+        ) as JwtPayload;
 
-            next();
+        req.user = decodedAccessToken;
+        
+        next();
+    } catch (error) {
+        console.error("Error verifying JWT:", error);
+
+        if (error instanceof jwt.JsonWebTokenError) {
+            return res.status(401).json({
+                success: false,
+                code: 401,
+                message: "Unauthorized: Access token is expired",
+            });
         }
-    );
+
+        return res.status(403).json({ 
+            success: false, 
+            code: 403, 
+            message: "Invalid tokensss",
+        });
+    }
 };
 
-export default verifyToken;
+export default verifyJWT;
