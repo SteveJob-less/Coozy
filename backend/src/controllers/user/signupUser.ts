@@ -1,6 +1,6 @@
-import { User } from "../../models/user";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
+import { User } from "../../models";
 
 const signupUser = async (req: Request, res: Response) => {
     try {
@@ -9,7 +9,6 @@ const signupUser = async (req: Request, res: Response) => {
         const existingUser = await User.findOne({ where: { email: Email } });
 
         if (existingUser) {
-            console.log("User already exists");
             return res.status(409).json({ 
                 success: false, 
                 code: 409,
@@ -19,7 +18,7 @@ const signupUser = async (req: Request, res: Response) => {
 
         const hashedPassword = await bcrypt.hash(Password, 10);
 
-        const newUser = await User.create({
+        await User.create({
             firstname: Firstname,
             lastname: Lastname,
             email: Email,
